@@ -1,6 +1,6 @@
-<h2 align="center"> ZR.Admin.NET Back-end management system</h2>
+<h2 align="center"> (English Version) ZR.Admin.NET Back-end management system</h2>
 <h4 align="center">base .Net7 + vue2.x/vue3.x/uniapp Front-end and back-end separation of .NET rapid development framework</h4>
-
+<h2 align="center"> NOTE : This english version ZR.Admin.NET Back-end management system is in progress of tranlsation code base is partially migrated as of right now.</h2>
 <div style="text-align:center">
 
 [![stars](https://gitee.com/izory/ZrAdminNetCore/badge/star.svg?theme=dark)](https://gitee.com/izory/ZrAdminNetCore)
