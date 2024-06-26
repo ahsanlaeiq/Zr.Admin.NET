@@ -44,7 +44,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 查询文章管理列表
+        /// Get the list of articles based on the provided parameters.
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -72,7 +72,7 @@ namespace ZR.Service.Content
             var response = Queryable()
                 .WithCache(60 * 24)
                 .IgnoreColumns(x => new { x.Content })
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Includes(x => x.ArticleCategoryNav) //Filler object
                 .Where(predicate.ToExpression())
                 //.OrderBy(x => x.CreateTime, OrderByType.Desc)
                 .ToPage<Article, ArticleDto>(parm);
@@ -81,7 +81,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 前台查询文章列表
+        /// Get the list of articles based on the provided parameters.
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -137,7 +137,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 前台查询动态列表
+        /// Get the list of moment articles based on the provided parameters.
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -152,7 +152,7 @@ namespace ZR.Service.Content
             predicate = predicate.AndIF(parm.CategoryId != null, m => m.CategoryId == parm.CategoryId);
 
             var response = Queryable()
-                .Includes(x => x.ArticleCategoryNav) //填充子对象
+                .Includes(x => x.ArticleCategoryNav) //Fill child object
                 .LeftJoin<SysUser>((m, u) => m.UserId == u.UserId).Filter(null, true)
                 .Where(predicate.ToExpression())
                 .OrderByIF(parm.OrderBy == 1, m => new { m.PraiseNum, m.CommentNum }, OrderByType.Desc)
@@ -182,8 +182,9 @@ namespace ZR.Service.Content
 
             return response;
         }
+
         /// <summary>
-        /// 前台查询关注动态列表
+        /// Get the list of moment articles based on the provided parameters for followed users.
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -196,11 +197,11 @@ namespace ZR.Service.Content
             predicate = predicate.AndIF(parm.TopicId != null, m => m.TopicId == parm.TopicId);
             predicate = predicate.AndIF(parm.CategoryId != null, m => m.CategoryId == parm.CategoryId);
 
-
             return new PagedInfo<ArticleDto>() { };
         }
+
         /// <summary>
-        /// 查询我的文章列表
+        /// Get my article list
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -232,7 +233,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 修改文章管理
+        /// Update article
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -254,7 +255,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 置顶文章
+        /// Top article
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -268,7 +269,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 评论权限
+        /// Change comment permission
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -282,7 +283,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 是否公开
+        /// Change article public status
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -296,7 +297,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 修改文章访问量
+        /// Update article hit count
         /// </summary>
         /// <param name="cid"></param>
         /// <returns></returns>
@@ -307,7 +308,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 点赞
+        /// Like an article
         /// </summary>
         /// <param name="cid"></param>
         /// <returns></returns>
@@ -315,6 +316,12 @@ namespace ZR.Service.Content
         {
             return Update(w => w.Cid == cid, it => new Article() { PraiseNum = it.PraiseNum + 1 });
         }
+
+        /// <summary>
+        /// Cancel like on an article
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <returns></returns>
         public int CancelPraise(long cid)
         {
             return Update(w => w.Cid == cid, it => new Article() { PraiseNum = it.PraiseNum - 1 });
@@ -326,7 +333,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 发布动态
+        /// Publish a moment
         /// </summary>
         /// <param name="article"></param>
         /// <returns></returns>
@@ -341,12 +348,12 @@ namespace ZR.Service.Content
             article.AuditStatus = AuditStatusEnum.Passed;
 
             article = InsertReturnEntity(article);
-            //跟新话题加入数
+            // Update topic join count
             if (article.Cid > 0 && article.TopicId > 0)
             {
                 _topicService.Update(w => w.TopicId == article.TopicId, it => new ArticleTopic() { JoinNum = it.JoinNum + 1 });
             }
-            //更新圈子加入数
+            // Update category join count
             if (article.Cid > 0 && article.CategoryId > 0)
             {
                 _categoryService.Update(w => w.CategoryId == article.CategoryId, it => new ArticleCategory() { JoinNum = it.JoinNum + 1 });
@@ -355,19 +362,19 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 获取文章详情
+        /// Get article details
         /// </summary>
-        /// <param name="cid">内容id</param>
-        /// <param name="userId">当前用户id</param>
+        /// <param name="cid">Content ID</param>
+        /// <param name="userId">Current user ID</param>
         /// <returns></returns>
         /// <exception cref="CustomException"></exception>
         public ArticleDto GetArticle(long cid, long userId)
         {
             var response = GetId(cid);
-            var model = response.Adapt<ArticleDto>() ?? throw new CustomException(ResultCode.FAIL, "内容不存在");
+            var model = response.Adapt<ArticleDto>() ?? throw new CustomException(ResultCode.FAIL, "Content does not exist");
             if (model.IsPublic == 0 && userId != model.UserId)
             {
-                throw new CustomException(ResultCode.CUSTOM_ERROR, "访问失败");
+                throw new CustomException(ResultCode.CUSTOM_ERROR, "Access denied");
             }
             if (model != null)
             {
@@ -402,7 +409,7 @@ namespace ZR.Service.Content
         }
 
         /// <summary>
-        /// 审核通过
+        /// Approve articles
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
@@ -434,14 +441,14 @@ namespace ZR.Service.Content
                        };
             foreach (var item in data)
             {
-                _userMsgService.AddSysUserMsg(item.userid, "您发布的内容已通过审核", UserMsgType.SYSTEM);
+                _userMsgService.AddSysUserMsg(item.userid, "Your content has been approved", UserMsgType.SYSTEM);
             }
 
             return result;
         }
 
         /// <summary>
-        /// 审核不通过
+        /// Reject articles
         /// </summary>
         /// <param name="reason"></param>
         /// <param name="idsArr"></param>
@@ -475,16 +482,17 @@ namespace ZR.Service.Content
             foreach (var item in data)
             {
                 //Console.WriteLine(item.useridx +"," + item.num);
-                string content = $"您发布的内容未通过审核。";
+                string content = $"Your content has not been approved.";
                 if (!string.IsNullOrEmpty(reason))
                 {
-                    content += $"原因：{reason}";
+                    content += $" Reason: {reason}";
                 }
                 _userMsgService.AddSysUserMsg(item.userid, content, UserMsgType.SYSTEM);
             }
 
             return result;
         }
+
 
     }
 }

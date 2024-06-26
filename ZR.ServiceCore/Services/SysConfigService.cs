@@ -4,12 +4,12 @@ using ZR.Model.System;
 namespace ZR.ServiceCore.Services
 {
     /// <summary>
-    /// 参数配置Service业务层处理
+    /// Business layer processing for parameter configuration service
     /// </summary>
     [AppService(ServiceType = typeof(ISysConfigService), ServiceLifetime = LifeTime.Transient)]
     public class SysConfigService : BaseService<SysConfig>, ISysConfigService
     {
-        #region 业务逻辑代码
+        #region Business Logic Code
 
         public SysConfig GetSysConfigByKey(string key)
         {
@@ -18,4 +18,5 @@ namespace ZR.ServiceCore.Services
 
         #endregion
     }
+
 }

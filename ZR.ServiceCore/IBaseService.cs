@@ -3,7 +3,7 @@
 namespace ZR.ServiceCore
 {
     /// <summary>
-    /// 基础服务定义
+    /// Base service definition
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IBaseService<T> : IBaseRepository<T> where T : class, new()

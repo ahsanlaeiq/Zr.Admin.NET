@@ -8,7 +8,7 @@ using ZR.Model.Models;
 namespace ZR.Admin.WebApi.Controllers
 {
     /// <summary>
-    /// 多语言配置Controller
+    /// Multilingual configuration Controller
     /// </summary>
     [Verify]
     [Route("system/CommonLang")]
@@ -16,7 +16,7 @@ namespace ZR.Admin.WebApi.Controllers
     public class CommonLangController : BaseController
     {
         /// <summary>
-        /// 多语言配置接口
+        /// Multilingual configuration interface
         /// </summary>
         private readonly ICommonLangService _CommonLangService;
 
@@ -26,7 +26,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询多语言配置列表
+        /// Query multilingual configuration list
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -48,7 +48,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询多语言配置列表
+        /// Query multilingual configuration list
         /// </summary>
         /// <returns></returns>
         [HttpGet("list/{lang}")]
@@ -61,7 +61,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询多语言配置详情
+        /// Query multilingual configuration details
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
@@ -78,7 +78,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询多语言配置详情
+        /// Query multilingual configuration details
         /// </summary>
         /// <param name="langKey"></param>
         /// <returns></returns>
@@ -94,17 +94,17 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 更新多语言配置
+        /// Update multilingual configuration
         /// </summary>
         /// <returns></returns>
         [HttpPut]
         [ActionPermissionFilter(Permission = "system:lang:edit")]
-        [Log(Title = "多语言配置", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Multilingual configuration", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateCommonLang([FromBody] CommonLangDto parm)
         {
             if (parm == null || parm.LangKey.IsEmpty())
             {
-                throw new CustomException("请求实体不能为空");
+                throw new CustomException("Request entity cannot be empty");
             }
 
             _CommonLangService.StorageCommonLang(parm);
@@ -113,16 +113,16 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 删除多语言配置
+        /// Delete multilingual configuration
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{ids}")]
         [ActionPermissionFilter(Permission = "system:lang:delete")]
-        [Log(Title = "多语言配置", BusinessType = BusinessType.DELETE)]
+        [Log(Title = "Multilingual configuration", BusinessType = BusinessType.DELETE)]
         public IActionResult DeleteCommonLang(string ids)
         {
             long[] idsArr = Tools.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"删除失败Id 不能为空")); }
+            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"Deletion failed. Id cannot be empty")); }
 
             var response = _CommonLangService.Delete(idsArr);
 
@@ -130,15 +130,15 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 删除多语言配置
+        /// Delete multilingual configuration
         /// </summary>
         /// <returns></returns>
         [HttpDelete("ByKey")]
         [ActionPermissionFilter(Permission = "system:lang:delete")]
-        [Log(Title = "多语言配置", BusinessType = BusinessType.DELETE)]
+        [Log(Title = "Multilingual configuration", BusinessType = BusinessType.DELETE)]
         public IActionResult DeleteCommonLangByKey(string langkey)
         {
-            if (langkey.IsEmpty()) { return ToResponse(ApiResult.Error($"删除失败Id 不能为空")); }
+            if (langkey.IsEmpty()) { return ToResponse(ApiResult.Error($"Deletion failed. Id cannot be empty")); }
 
             var response = _CommonLangService
                 .Deleteable()
@@ -149,10 +149,10 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 导出多语言配置
+        /// Export multilingual configuration
         /// </summary>
         /// <returns></returns>
-        [Log(Title = "多语言配置", BusinessType = BusinessType.EXPORT, IsSaveResponseData = false)]
+        [Log(Title = "Multilingual configuration", BusinessType = BusinessType.EXPORT, IsSaveResponseData = false)]
         [HttpGet("export")]
         [ActionPermissionFilter(Permission = "system:lang:export")]
         public IActionResult Export([FromQuery] CommonLangQueryDto parm)
@@ -160,17 +160,17 @@ namespace ZR.Admin.WebApi.Controllers
             parm.PageSize = 10000;
             var list = _CommonLangService.GetListToPivot(parm);
 
-            string sFileName = ExportExcel(list, "CommonLang", "多语言配置");
+            string sFileName = ExportExcel(list, "CommonLang", "Multilingual configuration");
             return SUCCESS(new { path = "/export/" + sFileName, fileName = sFileName });
         }
 
         /// <summary>
-        /// 导入
+        /// Import
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
         [HttpPost("importData")]
-        [Log(Title = "多语言设置导入", BusinessType = BusinessType.IMPORT, IsSaveRequestData = false, IsSaveResponseData = true)]
+        [Log(Title = "Multilingual settings import", BusinessType = BusinessType.IMPORT, IsSaveRequestData = false, IsSaveResponseData = true)]
         [ActionPermissionFilter(Permission = "system:lang:import")]
         public IActionResult ImportData([FromForm(Name = "file")] IFormFile formFile)
         {
@@ -192,11 +192,11 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 多语言设置导入模板下载
+        /// Download multilingual settings import template
         /// </summary>
         /// <returns></returns>
         [HttpGet("importTemplate")]
-        [Log(Title = "多语言设置模板", BusinessType = BusinessType.EXPORT, IsSaveRequestData = true, IsSaveResponseData = false)]
+        [Log(Title = "Multilingual settings template", BusinessType = BusinessType.EXPORT, IsSaveRequestData = true, IsSaveResponseData = false)]
         [AllowAnonymous]
         public IActionResult ImportTemplateExcel()
         {

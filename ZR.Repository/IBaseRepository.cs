@@ -22,7 +22,7 @@ namespace ZR.Repository
         int Update(T entity, bool ignoreNullColumns = false, object data = null);
 
         /// <summary>
-        /// 只更新表达式的值
+        /// Only update the values of the specified expressions.
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="expression"></param>
@@ -50,7 +50,7 @@ namespace ZR.Repository
 
         #region query
         /// <summary>
-        /// 根据条件查询分页数据
+        /// Get paginated data based on conditions
         /// </summary>
         /// <param name="where"></param>
         /// <param name="parm"></param>
@@ -68,7 +68,7 @@ namespace ZR.Repository
         List<T> SqlQueryToList(string sql, object obj = null);
 
         T GetId(object pkValue);
-
+        DataTable UseQueryToDataTable(string query, List<SugarParameter> parameters)
         #endregion query
 
         #region Procedure

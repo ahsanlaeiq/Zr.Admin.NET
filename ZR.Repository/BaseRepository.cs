@@ -12,32 +12,32 @@ using ZR.Model;
 namespace ZR.Repository
 {
     /// <summary>
-    /// 数据仓库类
+    /// Data repository class
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class BaseRepository<T> : SimpleClient<T> where T : class, new()
     {
-        public ITenant itenant = null;//多租户事务
+        public ITenant itenant = null;// Multi-tenant transaction
         public BaseRepository(ISqlSugarClient context = null) : base(context)
         {
-            //通过特性拿到ConfigId
+            // Get ConfigId through attribute
             var configId = typeof(T).GetCustomAttribute<TenantAttribute>()?.configId;
             if (configId != null)
             {
-                Context = DbScoped.SugarScope.GetConnectionScope(configId);//根据类传入的ConfigId自动选择
+                Context = DbScoped.SugarScope.GetConnectionScope(configId);// Automatically select based on the ConfigId passed in by the class
             }
             else
             {
-                Context = context ?? DbScoped.SugarScope.GetConnectionScope(0);//没有默认db0
+                Context = context ?? DbScoped.SugarScope.GetConnectionScope(0);// No default db0
             }
             //Context = DbScoped.SugarScope.GetConnectionScopeWithAttr<T>();
-            itenant = DbScoped.SugarScope;//设置租户接口
+            itenant = DbScoped.SugarScope;// Set tenant interface
         }
 
         #region add
 
         /// <summary>
-        /// 插入实体
+        /// Insert entity
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
@@ -67,7 +67,7 @@ namespace ZR.Repository
         //}
 
         /// <summary>
-        /// 实体根据主键更新
+        /// Update entity based on primary key
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="ignoreNullColumns"></param>
@@ -79,7 +79,7 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 实体根据主键更新指定字段
+        /// Update entity based on primary key and specified fields
         /// return Update(new SysUser(){ Status = 1 }, t => new { t.NickName, }, true);
         /// </summary>
         /// <param name="entity"></param>
@@ -92,12 +92,12 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 根据指定条件更新指定列 eg：Update(new SysUser(){ Status = 1 }, it => new { it.Status }, f => f.Userid == 1));
-        /// 只更新Status列，条件是包含
+        /// Update specified columns based on specified conditions eg: Update(new SysUser(){ Status = 1 }, it => new { it.Status }, f => f.Userid == 1));
+        /// Only update the Status column, condition is contains
         /// </summary>
-        /// <param name="entity">实体类</param>
-        /// <param name="expression">要更新列的表达式</param>
-        /// <param name="where">where表达式</param>
+        /// <param name="entity">Entity class</param>
+        /// <param name="expression">Expression of columns to update</param>
+        /// <param name="where">Where expression</param>
         /// <returns></returns>
         public int Update(T entity, Expression<Func<T, object>> expression, Expression<Func<T, bool>> where)
         {
@@ -105,7 +105,7 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 更新指定列 eg：Update(w => w.NoticeId == model.NoticeId, it => new SysNotice(){ Update_time = DateTime.Now, Title = "通知标题" });
+        /// Update specified columns eg: Update(w => w.NoticeId == model.NoticeId, it => new SysNotice(){ Update_time = DateTime.Now, Title = "Notification Title" });
         /// </summary>
         /// <param name="where"></param>
         /// <param name="columns"></param>
@@ -132,10 +132,10 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 
+        /// Use transaction
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="action">增删改查方法</param>
+        /// <param name="action">CRUD method</param>
         /// <returns></returns>
         public DbResult<bool> UseTran(ISqlSugarClient client, Action action)
         {
@@ -146,22 +146,22 @@ namespace ZR.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine("事务异常" + ex.Message);
+                Console.WriteLine("Transaction exception: " + ex.Message);
                 client.AsTenant().RollbackTran();
                 throw;
             }
         }
 
         /// <summary>
-        /// 使用事务
+        /// Use transaction
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
         public bool UseTran2(Action action)
         {
-            Console.WriteLine("---事务开始---");
+            Console.WriteLine("---Transaction start---");
             var result = Context.Ado.UseTran(() => action());
-            Console.WriteLine("---事务结束---");
+            Console.WriteLine("---Transaction end---");
             return result.IsSuccess;
         }
 
@@ -203,16 +203,31 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 根据主值查询单条数据
+        /// Query a Model record based on the SQL Query
+        /// https://github.com/DotNetNext/SqlSugar/wiki/7.Ado
         /// </summary>
-        /// <param name="pkValue">主键值</param>
-        /// <returns>泛型实体</returns>
+        /// <param name="query">SQL Query</param>
+        /// <returns>DataTable</returns>
+        public DataTable GetModelRawQuery(string query)
+        {
+            return Context.Ado.GetDataTable(query);
+        }
+
+        /// <summary>
+        /// Query a single record based on the primary key value
+        /// </summary>
+        /// <param name="pkValue">Primary key value</param>
+        /// <returns>Generic entity</returns>
         public T GetId(object pkValue)
         {
             return Context.Queryable<T>().InSingle(pkValue);
         }
+
+
+        
+
         /// <summary>
-        /// 根据条件查询分页数据
+        /// Query paged data based on conditions
         /// </summary>
         /// <param name="where"></param>
         /// <param name="parm"></param>
@@ -225,9 +240,9 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 分页获取数据
+        /// Get paged data
         /// </summary>
-        /// <param name="where">条件表达式</param>
+        /// <param name="where">Condition expression</param>
         /// <param name="parm"></param>
         /// <param name="order"></param>
         /// <param name="orderEnum"></param>
@@ -249,7 +264,7 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 查询所有数据(无分页,请慎用)
+        /// Query all data (without pagination, use with caution)
         /// </summary>
         /// <returns></returns>
         public List<T> GetAll(bool useCache = false, int cacheSecond = 3600)
@@ -260,9 +275,23 @@ namespace ZR.Repository
         #endregion query
 
         /// <summary>
-        /// 此方法不带output返回值
+        /// This method return Dataset output value of given Query
         /// var list = new List<SugarParameter>();
-        /// list.Add(new SugarParameter(ParaName, ParaValue)); input
+        /// list.Add(new SugarParameter(ParaName, ParaValue)); // input
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public DataTable UseQueryToDataTable(string query, List<SugarParameter> parameters)
+        {
+            return Context.Ado.GetDataTable(query, parameters);
+        }
+
+
+        /// <summary>
+        /// This method does not return an output value
+        /// var list = new List<SugarParameter>();
+        /// list.Add(new SugarParameter(ParaName, ParaValue)); // input
         /// </summary>
         /// <param name="procedureName"></param>
         /// <param name="parameters"></param>
@@ -273,10 +302,10 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 带output返回值
+        /// This method returns an output value
         /// var list = new List<SugarParameter>();
-        /// list.Add(new SugarParameter(ParaName, ParaValue, true));  output
-        /// list.Add(new SugarParameter(ParaName, ParaValue)); input
+        /// list.Add(new SugarParameter(ParaName, ParaValue, true)); // output
+        /// list.Add(new SugarParameter(ParaName, ParaValue)); // input
         /// </summary>
         /// <param name="procedureName"></param>
         /// <param name="parameters"></param>
@@ -289,16 +318,17 @@ namespace ZR.Repository
     }
 
     /// <summary>
-    /// 分页查询扩展
+    /// Paging query extension
     /// </summary>
+
     public static class QueryableExtension
     {
         /// <summary>
-        /// 读取列表
+        /// Read a list
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source">查询表单式</param>
-        /// <param name="parm">分页参数</param>
+        /// <param name="source">Query expression</param>
+        /// <param name="parm">Pagination parameters</param>
         /// <returns></returns>
         public static PagedInfo<T> ToPage<T>(this ISugarQueryable<T> source, PagerInfo parm)
         {
@@ -318,7 +348,7 @@ namespace ZR.Repository
         }
 
         /// <summary>
-        /// 转指定实体类Dto
+        /// Convert to a specified entity class DTO
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="T2"></typeparam>
@@ -344,4 +374,5 @@ namespace ZR.Repository
             return page;
         }
     }
+
 }

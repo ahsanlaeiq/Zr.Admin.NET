@@ -48,6 +48,7 @@ namespace ZR.Service.Content
             //predicate.AndIF(dto.ClassifyId == 0, it => it.ClassifyId == 0);
             predicate.AndIF(dto.TargetId > 0, it => it.TargetId == dto.TargetId);
 
+
             var list = Queryable()
                 .LeftJoin<SysUser>((it, u) => it.UserId == u.UserId)
                 .OrderByDescending(it => it.Top)

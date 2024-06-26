@@ -4,7 +4,7 @@
     public class SysBase
     {
         /// <summary>
-        /// 创建人
+        /// Creator
         /// </summary>
         [SugarColumn(IsOnlyIgnoreUpdate = true, Length = 64, IsNullable = true)]
         [JsonProperty(propertyName: "createBy")]
@@ -12,7 +12,7 @@
         public string Create_by { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Creation time
         /// </summary>
         [SugarColumn(IsOnlyIgnoreUpdate = true, IsNullable = true)]
         [JsonProperty(propertyName: "createTime")]
@@ -20,7 +20,7 @@
         public DateTime Create_time { get; set; } = DateTime.Now;
 
         /// <summary>
-        /// 更新人
+        /// Updater
         /// </summary>
         [JsonIgnore]
         [JsonProperty(propertyName: "updateBy")]
@@ -29,7 +29,7 @@
         public string Update_by { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Update time
         /// </summary>
         //[JsonIgnore]
         [SugarColumn(IsOnlyIgnoreInsert = true, IsNullable = true)]

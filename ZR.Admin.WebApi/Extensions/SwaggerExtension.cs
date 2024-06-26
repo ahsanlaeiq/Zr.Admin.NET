@@ -16,29 +16,43 @@ namespace ZR.Admin.WebApi.Extensions
         {
             app.UseSwagger(c =>
             {
+                // Configure the route template for the Swagger JSON endpoint
                 c.RouteTemplate = "swagger/{documentName}/swagger.json";
+
+                // Add a pre-serialize filter to modify the Swagger document before it is serialized
                 c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
                 {
+                    // Get the base URL of the application
                     var url = $"{httpReq.Scheme}://{httpReq.Host.Value}";
+
+                    // Get the Referer header from the HTTP request
                     var referer = httpReq.Headers["Referer"].ToString();
+
+                    // Check if the Referer contains a specific string
                     if (referer.Contains(GlobalConstant.DevApiProxy))
+                    {
+                        // Extract the URL from the Referer, excluding the specific string
                         url = referer[..(referer.IndexOf(GlobalConstant.DevApiProxy, StringComparison.InvariantCulture) + GlobalConstant.DevApiProxy.Length - 1)];
-                    swaggerDoc.Servers =
-                        new List<OpenApiServer>
+                    }
+
+                    // Set the server URL in the Swagger document
+                    swaggerDoc.Servers = new List<OpenApiServer>
+                    {
+                        new OpenApiServer
                         {
-                            new OpenApiServer
-                            {
-                                Url = url
-                            }
-                        };
+                            Url = url
+                        }
+                    };
                 });
             });
+
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("sys/swagger.json", "系统管理");
-                c.SwaggerEndpoint("article/swagger.json", "文章管理");
+                // Configure the Swagger UI to display multiple API endpoints
+                c.SwaggerEndpoint("sys/swagger.json", "System Management");
+                c.SwaggerEndpoint("article/swagger.json", "Article Management");
                 c.SwaggerEndpoint("v1/swagger.json", "business");
-                c.DocExpansion(DocExpansion.None); //->修改界面打开时自动折叠
+                c.DocExpansion(DocExpansion.None); // Modify the UI to collapse the documentation by default
             });
         }
 
@@ -53,14 +67,14 @@ namespace ZR.Admin.WebApi.Extensions
                 {
                     Title = "ZrAdmin.NET Api",
                     Version = "v1",
-                    Description = "系统管理",
+                    Description = "System Management",
                     Contact = new OpenApiContact { Name = "ZRAdmin doc", Url = new Uri("https://www.izhaorui.cn/doc") }
                 });
                 c.SwaggerDoc("article", new OpenApiInfo
                 {
                     Title = "ZrAdmin.NET Api",
                     Version = "v1",
-                    Description = "文章管理",
+                    Description = "Article Management",
                     Contact = new OpenApiContact { Name = "ZRAdmin doc", Url = new Uri("https://www.izhaorui.cn/doc") }
                 });
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -72,7 +86,7 @@ namespace ZR.Admin.WebApi.Extensions
                 try
                 {
                     //var tempPath = hostEnvironment.ContentRootPath;
-                    //添加文档注释
+                    // Add XML comments to the Swagger documentation
                     var baseDir = AppContext.BaseDirectory;
                     c.IncludeXmlComments(Path.Combine(baseDir, "ZR.Model.xml"), true);
                     c.IncludeXmlComments(Path.Combine(baseDir, "ZR.ServiceCore.xml"), true);
@@ -85,27 +99,27 @@ namespace ZR.Admin.WebApi.Extensions
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("swagger 文档加载失败" + ex.Message);
+                    Console.WriteLine("Failed to load Swagger documentation: " + ex.Message);
                 }
 
-                //参考文章：http://www.zyiz.net/tech/detail-134965.html
-                //需要安装包Swashbuckle.AspNetCore.Filters
-                // 开启权限小锁 需要在对应的Action上添加[Authorize]才能看到
+                // Reference articles: http://www.zyiz.net/tech/detail-134965.html
+                // Requires the package Swashbuckle.AspNetCore.Filters
+                // Enable the lock icon for authorization, requires [Authorize] attribute on corresponding actions
                 c.OperationFilter<AddResponseHeadersFilter>();
                 c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
 
-                //在header 中添加token，传递到后台
+                // Add token to the header and pass it to the backend
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
 
                 c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
                     new OpenApiSecurityScheme
                     {
                         In = ParameterLocation.Header,
-                        Description = "请输入Login接口返回的Token，前置Bearer。示例：Bearer {Token}",
-                        Name = "Authorization",//jwt默认的参数名称,
-                        Type = SecuritySchemeType.ApiKey, //指定ApiKey
-                        BearerFormat = "JWT",//标识承载令牌的格式 该信息主要是出于文档目的
-                        Scheme = JwtBearerDefaults.AuthenticationScheme//授权中要使用的HTTP授权方案的名称
+                        Description = "Please enter the Token returned by the Login interface, prefixed with Bearer. Example: Bearer {Token}",
+                        Name = "Authorization", // Default parameter name for JWT
+                        Type = SecuritySchemeType.ApiKey, // Specify ApiKey
+                        BearerFormat = "JWT", // Indicates the format of the bearer token, mainly for documentation purposes
+                        Scheme = JwtBearerDefaults.AuthenticationScheme // Name of the HTTP authentication scheme to be used in authorization
                     });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -120,12 +134,12 @@ namespace ZR.Admin.WebApi.Extensions
 
                 try
                 {
-                    //判断接口归于哪个分组
+                    // Determine which group the API belongs to
                     c.DocInclusionPredicate((docName, apiDescription) =>
                     {
                         if (docName == "v1")
                         {
-                            //当分组为NoGroup时，只要没加特性的都属于这个组
+                            // When the group is NoGroup, any API without attributes belongs to this group
                             return string.IsNullOrEmpty(apiDescription.GroupName);
                         }
                         else

@@ -7,7 +7,7 @@ using ZR.Service.Content.IService;
 namespace ZR.Admin.WebApi.Controllers
 {
     /// <summary>
-    /// 内容管理
+    /// Content management
     /// </summary>
     [Verify]
     [Route("article")]
@@ -15,7 +15,7 @@ namespace ZR.Admin.WebApi.Controllers
     public class ArticleController : BaseController
     {
         /// <summary>
-        /// 文章接口
+        /// Article interface
         /// </summary>
         private readonly IArticleService _ArticleService;
         private readonly IArticleCategoryService _ArticleCategoryService;
@@ -30,7 +30,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询文章列表
+        /// Query article list
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
@@ -43,38 +43,38 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 内容批量审核通过
+        /// Batch approve content
         /// </summary>
         /// <returns></returns>
         [HttpPut("pass/{ids}")]
         [ActionPermissionFilter(Permission = "article:audit")]
-        [Log(Title = "内容审核", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Content audit", BusinessType = BusinessType.UPDATE)]
         public IActionResult PassedMonents(string ids)
         {
             long[] idsArr = Tools.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"审核通过失败Id 不能为空")); }
+            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"Failed to approve Id cannot be empty")); }
 
             return ToResponse(_ArticleService.Passed(idsArr));
         }
 
         /// <summary>
-        /// 内容批量审核拒绝
+        /// Batch reject content
         /// </summary>
         /// <returns></returns>
         [HttpPut("reject/{ids}")]
         [ActionPermissionFilter(Permission = "article:audit")]
-        [Log(Title = "内容审核", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Content audit", BusinessType = BusinessType.UPDATE)]
         public IActionResult RejectMonents(string ids, string reason = "")
         {
             long[] idsArr = Tools.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"審核拒绝失败Id 不能为空")); }
+            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"Failed to reject Id cannot be empty")); }
 
             int result = _ArticleService.Reject(reason, idsArr);
             return ToResponse(result);
         }
 
         /// <summary>
-        /// 查询我的文章列表
+        /// Query my article list
         /// </summary>
         /// <returns></returns>
         [HttpGet("mylist")]
@@ -87,7 +87,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询文章详情
+        /// Query article details
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -103,12 +103,12 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 发布文章
+        /// Publish article
         /// </summary>
         /// <returns></returns>
         [HttpPost("add")]
         [ActionPermissionFilter(Permission = "system:article:add")]
-        //[Log(Title = "发布文章", BusinessType = BusinessType.INSERT)]
+        //[Log(Title = "Publish article", BusinessType = BusinessType.INSERT)]
         public IActionResult Create([FromBody] ArticleDto parm)
         {
             var addModel = parm.Adapt<Article>().ToCreate(context: HttpContext);
@@ -122,12 +122,12 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 更新文章
+        /// Update article
         /// </summary>
         /// <returns></returns>
         [HttpPut("edit")]
         [ActionPermissionFilter(Permission = "system:article:update")]
-        //[Log(Title = "文章修改", BusinessType = BusinessType.UPDATE)]
+        //[Log(Title = "Modify article", BusinessType = BusinessType.UPDATE)]
         public IActionResult Update([FromBody] ArticleDto parm)
         {
             parm.AuthorName = HttpContext.GetName();
@@ -138,12 +138,12 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 置顶
+        /// Top
         /// </summary>
         /// <returns></returns>
         [HttpPut("top")]
         [ActionPermissionFilter(Permission = "system:article:update")]
-        [Log(Title = "置顶文章", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Top article", BusinessType = BusinessType.UPDATE)]
         public IActionResult Top([FromBody] Article parm)
         {
             var response = _ArticleService.TopArticle(parm);
@@ -152,12 +152,12 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 是否公开
+        /// Is public
         /// </summary>
         /// <returns></returns>
         [HttpPut("changePublic")]
         [ActionPermissionFilter(Permission = "system:article:update")]
-        [Log(Title = "是否公开", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Is public", BusinessType = BusinessType.UPDATE)]
         public IActionResult ChangePublic([FromBody] Article parm)
         {
             var response = _ArticleService.ChangeArticlePublic(parm);
@@ -166,12 +166,12 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 删除文章
+        /// Delete article
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ActionPermissionFilter(Permission = "system:article:delete")]
-        [Log(Title = "文章删除", BusinessType = BusinessType.DELETE)]
+        [Log(Title = "Delete article", BusinessType = BusinessType.DELETE)]
         public IActionResult Delete(int id = 0)
         {
             var response = _ArticleService.Delete(id);

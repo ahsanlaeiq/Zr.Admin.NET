@@ -12,36 +12,36 @@ namespace Infrastructure
     public static class App
     {
         /// <summary>
-        /// 全局配置文件
+        /// Global configuration file
         /// </summary>
         public static OptionsSetting OptionsSetting => CatchOrDefault(() => ServiceProvider?.GetService<IOptions<OptionsSetting>>()?.Value);
 
         /// <summary>
-        /// 服务提供器
+        /// Service provider
         /// </summary>
         public static IServiceProvider ServiceProvider => InternalApp.ServiceProvider;
         /// <summary>
-        /// 获取请求上下文
+        /// Get the request context
         /// </summary>
         public static HttpContext HttpContext => CatchOrDefault(() => ServiceProvider?.GetService<IHttpContextAccessor>()?.HttpContext);
         /// <summary>
-        /// 获取请求上下文用户
+        /// Get the user from the request context
         /// </summary>
         public static ClaimsPrincipal User => HttpContext?.User;
         /// <summary>
-        /// 获取用户名
+        /// Get the username
         /// </summary>
         public static string UserName => User?.Identity?.Name;
         /// <summary>
-        /// 获取Web主机环境
+        /// Get the web host environment
         /// </summary>
-        public static IWebHostEnvironment WebHostEnvironment => InternalApp.WebHostEnvironment; 
+        public static IWebHostEnvironment WebHostEnvironment => InternalApp.WebHostEnvironment;
         /// <summary>
-        /// 获取全局配置
+        /// Get the global configuration
         /// </summary>
         public static IConfiguration Configuration => CatchOrDefault(() => InternalApp.Configuration, new ConfigurationBuilder().Build());
         /// <summary>
-        /// 获取请求生命周期的服务
+        /// Get a service from the request scope
         /// </summary>
         /// <typeparam name="TService"></typeparam>
         /// <returns></returns>
@@ -52,7 +52,7 @@ namespace Infrastructure
         }
 
         /// <summary>
-        /// 获取请求生命周期的服务
+        /// Get a service from the request scope
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -62,7 +62,7 @@ namespace Infrastructure
         }
 
         /// <summary>
-        /// 获取请求生命周期的服务
+        /// Get a required service from the request scope
         /// </summary>
         /// <typeparam name="TService"></typeparam>
         /// <returns></returns>
@@ -73,7 +73,7 @@ namespace Infrastructure
         }
 
         /// <summary>
-        /// 获取请求生命周期的服务
+        /// Get a required service from the request scope
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -83,11 +83,11 @@ namespace Infrastructure
         }
 
         /// <summary>
-        /// 处理获取对象异常问题
+        /// Handle exceptions when getting objects
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
-        /// <param name="action">获取对象委托</param>
-        /// <param name="defaultValue">默认值</param>
+        /// <typeparam name="T">Type</typeparam>
+        /// <param name="action">Delegate to get the object</param>
+        /// <param name="defaultValue">Default value</param>
         /// <returns>T</returns>
         private static T CatchOrDefault<T>(Func<T> action, T defaultValue = null)
             where T : class

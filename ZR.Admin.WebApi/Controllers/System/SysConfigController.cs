@@ -7,7 +7,7 @@ using ZR.Model.System.Dto;
 namespace ZR.Admin.WebApi.Controllers
 {
     /// <summary>
-    /// 参数配置Controller
+    /// Parameter configuration Controller
     /// </summary>
     [Verify]
     [Route("system/config")]
@@ -15,7 +15,7 @@ namespace ZR.Admin.WebApi.Controllers
     public class SysConfigController : BaseController
     {
         /// <summary>
-        /// 参数配置接口
+        /// Parameter configuration interface
         /// </summary>
         private readonly ISysConfigService _SysConfigService;
 
@@ -25,7 +25,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询参数配置列表
+        /// Query parameter configuration list
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
@@ -46,7 +46,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 查询参数配置详情
+        /// Query parameter configuration details
         /// </summary>
         /// <param name="ConfigId"></param>
         /// <returns></returns>
@@ -60,7 +60,7 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 根据参数键名查询参数值
+        /// Query parameter value by parameter key
         /// </summary>
         /// <param name="configKey"></param>
         /// <returns></returns>
@@ -74,17 +74,17 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 添加参数配置
+        /// Add parameter configuration
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         [ActionPermissionFilter(Permission = "system:config:add")]
-        [Log(Title = "参数配置添加", BusinessType = BusinessType.INSERT)]
+        [Log(Title = "Parameter configuration added", BusinessType = BusinessType.INSERT)]
         public IActionResult AddSysConfig([FromBody] SysConfigDto parm)
         {
             if (parm == null)
             {
-                throw new CustomException("请求参数错误");
+                throw new CustomException("Request parameter error");
             }
             var model = parm.Adapt<SysConfig>().ToCreate(HttpContext);
 
@@ -101,17 +101,17 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 更新参数配置
+        /// Update parameter configuration
         /// </summary>
         /// <returns></returns>
         [HttpPut]
         [ActionPermissionFilter(Permission = "system:config:update")]
-        [Log(Title = "参数配置修改", BusinessType = BusinessType.UPDATE)]
+        [Log(Title = "Parameter configuration modified", BusinessType = BusinessType.UPDATE)]
         public IActionResult UpdateSysConfig([FromBody] SysConfigDto parm)
         {
             if (parm == null)
             {
-                throw new CustomException("请求实体不能为空");
+                throw new CustomException("Request entity cannot be empty");
             }
             var model = parm.Adapt<SysConfig>().ToUpdate(HttpContext);
 
@@ -130,18 +130,18 @@ namespace ZR.Admin.WebApi.Controllers
         }
 
         /// <summary>
-        /// 删除参数配置
+        /// Delete parameter configuration
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{ids}")]
         [ActionPermissionFilter(Permission = "system:config:remove")]
-        [Log(Title = "参数配置删除", BusinessType = BusinessType.DELETE)]
+        [Log(Title = "Parameter configuration deleted", BusinessType = BusinessType.DELETE)]
         public IActionResult DeleteSysConfig(string ids)
         {
             int[] idsArr = Tools.SpitIntArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"删除失败Id 不能为空")); }
+            if (idsArr.Length <= 0) { return ToResponse(ApiResult.Error($"Deletion failed. Id cannot be empty")); }
             int sysCount = _SysConfigService.Count(s => s.ConfigType == "Y" && idsArr.Contains(s.ConfigId));
-            if (sysCount > 0) { return ToResponse(ApiResult.Error($"删除失败Id： 系统内置参数不能删除！")); }
+            if (sysCount > 0) { return ToResponse(ApiResult.Error($"Deletion failed. System built-in parameters cannot be deleted!")); }
             var response = _SysConfigService.Delete(idsArr);
 
             return SUCCESS(response);

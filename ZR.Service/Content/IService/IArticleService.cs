@@ -8,7 +8,7 @@ namespace ZR.Service.Content.IService
         PagedInfo<ArticleDto> GetList(ArticleQueryDto parm);
         PagedInfo<ArticleDto> GetMyList(ArticleQueryDto parm);
         /// <summary>
-        /// 修改文章管理
+        /// Update article
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
